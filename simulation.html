@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Compton Effect Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: #fff;
+            text-align: center;
+            padding: 30px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .container {
+            margin-top: 40px;
+        }
+
+        .simulation {
+            position: relative;
+            width: 600px;
+            height: 300px;
+            margin: 40px auto;
+            border: 2px solid #444;
+            background-color: #222;
+        }
+
+        .photon,
+        .scattered {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: yellow;
+            position: absolute;
+            top: 140px;
+        }
+
+        .electron {
+            width: 20px;
+            height: 20px;
+            background-color: cyan;
+            border-radius: 50%;
+            position: absolute;
+            left: 280px;
+            top: 140px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Compton Scattering Simulation</h1>
+
+    <div class="container">
+        <label>Initial Wavelength (nm):</label>
+        <input type="number" id="initialWavelength" placeholder="e.g. 100" />
+
+        <label>Scattering Angle (degrees):</label>
+        <input type="number" id="angle" placeholder="e.g. 60" />
+
+        <br>
+        <button onclick="simulate()">Simulate</button>
+    </div>
+
+    <p id="result"></p>
+
+    <!-- <div class="simulation" id="simArea">
+  <div class="photon" id="incomingPhoton"></div>
+  <div class="electron" id="electron"></div>
+  <div class="photon" id="scatteredPhoton" style="background-color: orange;"></div>
+</div> -->
+
+    <div class="simulation" id="simArea" style="position: relative;">
+        <svg id="scatteringSVG" width="600" height="300" style="position:absolute;top:0;left:0;z-index:0;"></svg>
+        <div class="photon" id="incomingPhoton" style="z-index:1;"></div>
+        <div class="electron" id="electron" style="z-index:1;"></div>
+        <div class="photon" id="scatteredPhoton" style="background-color: orange; z-index:1;"></div>
+    </div>
+
+    <!-- <script>
+  const h = 6.626e-34;
+  const c = 3e8;
+  const me = 9.11e-31;
+  const comptonConst = h / (me * c);  // ≈ 2.43e-12 m
+
+  function simulate() {
+    const lambda0 = parseFloat(document.getElementById('initialWavelength').value) * 1e-9;
+    const thetaDeg = parseFloat(document.getElementById('angle').value);
+    const thetaRad = thetaDeg * Math.PI / 180;
+
+    const deltaLambda = comptonConst * (1 - Math.cos(thetaRad));
+    const lambdaScattered = lambda0 + deltaLambda;
+    const lambdaScattered_nm = lambdaScattered * 1e9;
+
+    document.getElementById("result").innerHTML =
+      Scattered Wavelength: <strong>${lambdaScattered_nm.toFixed(3)} nm</strong>;
+
+    animateScattering(thetaDeg);
+  }
+
+  function animateScattering(angle) {
+    const incoming = document.getElementById("incomingPhoton");
+    const scattered = document.getElementById("scatteredPhoton");
+
+    // Reset positions
+    incoming.style.left = "0px";
+    scattered.style.left = "280px";
+    scattered.style.top = "140px";
+
+    let t = 0;
+    const interval = setInterval(() => {
+      if (t > 280) {
+        clearInterval(interval);
+        scatterPhoton(angle);
+        return;
+      }
+      incoming.style.left = ${t}px;
+      t += 4;
+    }, 10);
+  }
+
+  function scatterPhoton(angle) {
+    const scattered = document.getElementById("scatteredPhoton");
+    let t = 0;
+    const thetaRad = angle * Math.PI / 180;
+    const vx = Math.cos(thetaRad);
+    const vy = -Math.sin(thetaRad);
+
+    const interval = setInterval(() => {
+      if (t > 100) {
+        clearInterval(interval);
+        return;
+      }
+      scattered.style.left = ${280 + vx * t}px;
+      scattered.style.top = ${140 + vy * t}px;
+      t += 2;
+    }, 20);
+  }
+</script> -->
+
+    <!-- <script>
+  const h = 6.626e-34;
+  const c = 3e8;
+  const me = 9.11e-31;
+  const comptonConst = h / (me * c);  // ≈ 2.43e-12 m
+
+  function simulate() {
+    const lambda0 = parseFloat(document.getElementById('initialWavelength').value) * 1e-9;
+    const thetaDeg = parseFloat(document.getElementById('angle').value);
+    const thetaRad = thetaDeg * Math.PI / 180;
+
+    const deltaLambda = comptonConst * (1 - Math.cos(thetaRad));
+    const lambdaScattered = lambda0 + deltaLambda;
+    const lambdaScattered_nm = lambdaScattered * 1e9;
+
+    document.getElementById("result").innerHTML =
+      `Scattered Wavelength: <strong>${lambdaScattered_nm.toFixed(3)} nm</strong>`;
+
+    animateScattering(thetaDeg);
+  }
+
+  function animateScattering(angle) {
+    const incoming = document.getElementById("incomingPhoton");
+    const scattered = document.getElementById("scatteredPhoton");
+
+    // Reset positions
+    incoming.style.left = "0px";
+    scattered.style.left = "280px";
+    scattered.style.top = "140px";
+    scattered.style.display = "none"; // Hide until scattering
+
+    let t = 0;
+    const interval = setInterval(() => {
+      if (t > 280) {
+        clearInterval(interval);
+        scatterPhoton(angle);
+        return;
+      }
+      incoming.style.left = t + "px";
+      t += 4;
+    }, 10);
+  }
+
+  function scatterPhoton(angle) {
+    const incoming = document.getElementById("incomingPhoton");
+    const scattered = document.getElementById("scatteredPhoton");
+    incoming.style.left = "280px"; // Ensure at collision point
+    scattered.style.display = "block"; // Show scattered photon
+
+    let t = 0;
+    const thetaRad = angle * Math.PI / 180;
+    const vx = Math.cos(thetaRad);
+    const vy = -Math.sin(thetaRad);
+
+    const interval = setInterval(() => {
+      if (t > 100) {
+        clearInterval(interval);
+        return;
+      }
+      scattered.style.left = (280 + vx * t) + "px";
+      scattered.style.top = (140 + vy * t) + "px";
+      t += 2;
+    }, 20);
+  }
+</script> -->
+
+    <script>
+        const h = 6.626e-34;
+        const c = 3e8;
+        const me = 9.11e-31;
+        const comptonConst = h / (me * c);  // ≈ 2.43e-12 m
+
+        function simulate() {
+            const lambda0 = parseFloat(document.getElementById('initialWavelength').value) * 1e-9;
+            const thetaDeg = parseFloat(document.getElementById('angle').value);
+            const thetaRad = thetaDeg * Math.PI / 180;
+
+            const deltaLambda = comptonConst * (1 - Math.cos(thetaRad));
+            const lambdaScattered = lambda0 + deltaLambda;
+            const lambdaScattered_nm = lambdaScattered * 1e9;
+
+            document.getElementById("result").innerHTML =
+                `Scattered Wavelength: <strong>${lambdaScattered_nm.toFixed(3)} nm</strong>`;
+
+            drawScatteringDiagram(thetaDeg);
+            animateScattering(thetaDeg);
+        }
+
+        //  function drawScatteringDiagram(angle) {
+        // const svg = document.getElementById("scatteringSVG");
+        // svg.innerHTML = ""; // Clear previous
+
+        // // Coordinates for collision point (electron)
+        // const cx = 280, cy = 140;
+        // const r = 80; // Length for lines
+
+        // // Incident photon line (left to electron)
+        // const incidentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        // incidentLine.setAttribute("x1", cx - r);
+        // incidentLine.setAttribute("y1", cy);
+        // incidentLine.setAttribute("x2", cx);
+        // incidentLine.setAttribute("y2", cy);
+        // incidentLine.setAttribute("stroke", "#0ff");
+        // incidentLine.setAttribute("stroke-width", "2");
+        // svg.appendChild(incidentLine);
+
+        // // Scattered photon line (from electron at angle)
+        // const thetaRad = angle * Math.PI / 180;
+        // const x2 = cx + r * Math.cos(thetaRad);
+        // const y2 = cy - r * Math.sin(thetaRad);
+        // const scatteredLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        // scatteredLine.setAttribute("x1", cx);
+        // scatteredLine.setAttribute("y1", cy);
+        // scatteredLine.setAttribute("x2", x2);
+        // scatteredLine.setAttribute("y2", y2);
+        // scatteredLine.setAttribute("stroke", "orange");
+        // scatteredLine.setAttribute("stroke-width", "2");
+        // svg.appendChild(scatteredLine);
+
+        // // Draw coordinate axes
+        // const axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        // axisX.setAttribute("x1", 0);
+        // axisX.setAttribute("y1", cy);
+        // axisX.setAttribute("x2", 600);
+        // axisX.setAttribute("y2", cy);
+        // axisX.setAttribute("stroke", "#888");
+        // axisX.setAttribute("stroke-dasharray", "4,4");
+        // svg.appendChild(axisX);
+
+        // const axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        // axisY.setAttribute("x1", cx);
+        // axisY.setAttribute("y1", 0);
+        // axisY.setAttribute("x2", cx);
+        // axisY.setAttribute("y2", 300);
+        // axisY.setAttribute("stroke", "#888");
+        // axisY.setAttribute("stroke-dasharray", "4,4");
+        // svg.appendChild(axisY);
+
+        // // Draw angle arc
+        // const arcRadius = 30;
+        // const arcStart = `M ${cx + arcRadius} ${cy}`;
+        // const arcEndX = cx + arcRadius * Math.cos(thetaRad);
+        // const arcEndY = cy - arcRadius * Math.sin(thetaRad);
+        // const arcFlag = angle > 180 ? 1 : 0;
+        // const arcPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        // arcPath.setAttribute("d", `${arcStart} A ${arcRadius} ${arcRadius} 0 ${arcFlag} 0 ${arcEndX} ${arcEndY}`);
+        // arcPath.setAttribute("stroke", "#fff");
+        // arcPath.setAttribute("stroke-width", "2");
+        // arcPath.setAttribute("fill", "none");
+        // svg.appendChild(arcPath);
+
+        // // Angle label
+        // const labelX = cx + (arcRadius + 15) * Math.cos(thetaRad / 2);
+        // const labelY = cy - (arcRadius + 15) * Math.sin(thetaRad / 2);
+        // const angleText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        // angleText.setAttribute("x", labelX);
+        // angleText.setAttribute("y", labelY);
+        // angleText.setAttribute("fill", "#fff");
+        // angleText.setAttribute("font-size", "16");
+        // angleText.textContent = `${angle}°`;
+        // svg.appendChild(angleText);
+        // }
+
+        function drawScatteringDiagram(angle) {
+            const svg = document.getElementById("scatteringSVG");
+            svg.innerHTML = ""; // Clear previous
+
+            // Coordinates for collision point (electron)
+            const cx = 280, cy = 140;
+            const r = 80; // Length for lines
+
+            // Incident photon line (left to electron)
+            const incidentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            incidentLine.setAttribute("x1", cx - r);
+            incidentLine.setAttribute("y1", cy);
+            incidentLine.setAttribute("x2", cx);
+            incidentLine.setAttribute("y2", cy);
+            incidentLine.setAttribute("stroke", "#0ff");
+            incidentLine.setAttribute("stroke-width", "2");
+            svg.appendChild(incidentLine);
+
+            // Scattered photon line (from electron at angle, 4th quadrant)
+            const thetaRad = angle * Math.PI / 180;
+            const x2 = cx + r * Math.cos(thetaRad);
+            const y2 = cy + r * Math.sin(thetaRad);
+            const scatteredLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            scatteredLine.setAttribute("x1", cx);
+            scatteredLine.setAttribute("y1", cy);
+            scatteredLine.setAttribute("x2", x2);
+            scatteredLine.setAttribute("y2", y2);
+            scatteredLine.setAttribute("stroke", "orange");
+            scatteredLine.setAttribute("stroke-width", "2");
+            svg.appendChild(scatteredLine);
+
+            // Draw coordinate axes
+            const axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisX.setAttribute("x1", 0);
+            axisX.setAttribute("y1", cy);
+            axisX.setAttribute("x2", 600);
+            axisX.setAttribute("y2", cy);
+            axisX.setAttribute("stroke", "#888");
+            axisX.setAttribute("stroke-dasharray", "4,4");
+            svg.appendChild(axisX);
+
+            const axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisY.setAttribute("x1", cx);
+            axisY.setAttribute("y1", 0);
+            axisY.setAttribute("x2", cx);
+            axisY.setAttribute("y2", 300);
+            axisY.setAttribute("stroke", "#888");
+            axisY.setAttribute("stroke-dasharray", "4,4");
+            svg.appendChild(axisY);
+
+            // Draw angle arc in 3rd quadrant (down and left)
+            const arcRadius = 30;
+            // Arc from left (incident) to down-left (3rd quadrant)
+            const arcStartAngle = 0; // 180 deg (left)
+            const arcEndAngle =  (-1)*thetaRad; // left + scattering angle
+            const arcStartX = cx + arcRadius * Math.cos(arcStartAngle);
+            const arcStartY = cy + arcRadius * Math.sin(arcStartAngle);
+            const arcEndX = cx + arcRadius * Math.cos(arcEndAngle);
+            const arcEndY = cy + arcRadius * Math.sin(arcEndAngle);
+            const arcFlag = angle > 180 ? 1 : 0;
+            const arcPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            arcPath.setAttribute(
+                "d",
+                `M ${arcStartX} ${arcStartY} A ${arcRadius} ${arcRadius} 0 ${arcFlag} 1 ${arcEndX} ${arcEndY}`
+            );
+            arcPath.setAttribute("stroke", "#fff");
+            arcPath.setAttribute("stroke-width", "2");
+            arcPath.setAttribute("fill", "none");
+            svg.appendChild(arcPath);
+
+            // Angle label in the middle of the arc (3rd quadrant)
+            const labelAngle = arcStartAngle + thetaRad / 2;
+            const labelX = cx + (arcRadius + 15) * Math.cos(labelAngle);
+            const labelY = cy + (arcRadius + 15) * Math.sin(labelAngle);
+            const angleText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            angleText.setAttribute("x", labelX);
+            angleText.setAttribute("y", labelY);
+            angleText.setAttribute("fill", "#fff");
+            angleText.setAttribute("font-size", "16");
+            angleText.textContent = `${angle}°`;
+            svg.appendChild(angleText);
+        }
+        function animateScattering(angle) {
+            const incoming = document.getElementById("incomingPhoton");
+            const scattered = document.getElementById("scatteredPhoton");
+            const electron = document.getElementById("electron");
+
+            // Reset positions
+            incoming.style.left = "0px";
+            incoming.style.top = "140px";
+            incoming.style.display = "block";
+            scattered.style.left = "280px";
+            scattered.style.top = "140px";
+            scattered.style.display = "none"; // Hide until scattering
+
+            let t = 0;
+            const interval = setInterval(() => {
+                if (t > 280) {
+                    clearInterval(interval);
+                    incoming.style.display = "none"; // Hide incoming photon at collision
+                    scatterPhoton(angle);
+                    return;
+                }
+                incoming.style.left = t + "px";
+                t += 4;
+            }, 10);
+        }
+        // function scatterPhoton(angle) {
+        //     const incoming = document.getElementById("incomingPhoton");
+        //     const scattered = document.getElementById("scatteredPhoton");
+        //     const electron = document.getElementById("electron");
+        //     incoming.style.left = "280px"; // Ensure at collision point
+        //     scattered.style.display = "block"; // Show scattered photon
+
+        //     let t = 0;
+        //     const thetaRad = angle * Math.PI / 180;
+        //     const vx = Math.cos(thetaRad);
+        //     const vy = -Math.sin(thetaRad);
+
+        //     // Electron moves at 1/3rd the speed of the scattered photon for effect
+        //     const electronVx = vx * 0.33;
+        //     const electronVy = vy * 0.33;
+
+        //     const interval = setInterval(() => {
+        //         if (t > 100) {
+        //             clearInterval(interval);
+        //             return;
+        //         }
+        //         scattered.style.left = (280 + vx * t) + "px";
+        //         scattered.style.top = (140 + vy * t) + "px";
+        //         electron.style.left = (280 + electronVx * t) + "px";
+        //         electron.style.top = (140 + electronVy * t) + "px";
+        //         t += 2;
+        //     }, 20);
+        // }
+        function scatterPhoton(angle) {
+            const incoming = document.getElementById("incomingPhoton");
+            const scattered = document.getElementById("scatteredPhoton");
+            const electron = document.getElementById("electron");
+            incoming.style.left = "280px"; // Ensure at collision point
+            scattered.style.display = "block"; // Show scattered photon
+
+            let t = 0;
+            const thetaRad = angle * Math.PI / 180;
+
+            // Get initial and scattered wavelengths (in meters)
+            const lambda0 = parseFloat(document.getElementById('initialWavelength').value) * 1e-9;
+            const deltaLambda = comptonConst * (1 - Math.cos(thetaRad));
+            const lambdaScattered = lambda0 + deltaLambda;
+
+            // Calculate electron recoil angle using the provided formula
+            const numerator = lambda0 * Math.sin(thetaRad);
+            const denominator = lambdaScattered - lambda0 * Math.cos(thetaRad);
+            const phi = Math.atan2(numerator, denominator); // radians, measured from x-axis
+
+            // Photon velocity components (4th quadrant: +x, +y)
+            const vx = Math.cos(thetaRad);
+            const vy = Math.sin(thetaRad);
+
+            // Electron velocity components (1st quadrant: +x, -y)
+            const electronVx = Math.cos(phi) * 0.5;
+            const electronVy = -Math.sin(phi) * 0.5;
+
+            const interval = setInterval(() => {
+                if (t > 100) {
+                    clearInterval(interval);
+                    return;
+                }
+                scattered.style.left = (280 + vx * t) + "px";
+                scattered.style.top = (140 + vy * t) + "px";
+                electron.style.left = (280 + electronVx * t) + "px";
+                electron.style.top = (140 + electronVy * t) + "px";
+                t += 2;
+            }, 20);
+        }
+    </script>
+
+</body>
+
+</html>
