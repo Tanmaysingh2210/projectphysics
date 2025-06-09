@@ -5,12 +5,17 @@
     <meta charset="UTF-8">
     <title>Compton Effect Simulation</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+    </style>
+    <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #111;
+            background-color: #2e2a2a;
             color: #fff;
             text-align: center;
             padding: 30px;
+            border: 2px solid rgb(146, 142, 142);
+            font-family: "Baloo 2", sans-serif;
         }
 
         input,
@@ -22,8 +27,28 @@
             border: none;
         }
 
+        h1 {
+            text-decoration: underline;
+
+        }
+
+        #initialWavelength {
+            border: 2px solid black;
+        }
+
         .container {
             margin-top: 40px;
+        }
+
+        .container label {
+            font-size: 23px;
+            font-weight: 500;
+        }
+        .container button{
+            border: 2px solid rgb(178, 172, 172);
+            background-color: rgb(133, 123, 123);
+            color: white;
+            font-weight: 600;
         }
 
         .simulation {
@@ -66,16 +91,17 @@
         <input type="number" id="initialWavelength" placeholder="Enter wavelength" />
 
         <div class="slider-container">
-          <h2>Angle Selector (0° to 180°)</h2>
-          <input type="range" id="angleSlider" min="0" max="180" value="90">
-          <div class="value">Selected: <span id="sliderValue">90</span>°</div>
+            <h2>Angle Selector (0° to 180°)</h2>
+            <input type="range" id="angleSlider" min="0" max="180" value="90">
+            <div class="value">Selected: <span id="sliderValue">90</span>°</div>
         </div>
 
         <br>
-        <button onclick="simulate()">Simulate</button>
+        <button style="cursor: pointer;" onclick="simulate()">Simulate</button>
     </div>
 
     <p id="result"></p>
+    <p id="result2"></p>
 
 
     <div class="simulation" id="simArea" style="position: relative;">
@@ -94,7 +120,7 @@
         const slider = document.getElementById('angleSlider');
         const output = document.getElementById('sliderValue');
 
-        
+
 
         function simulate() {
             const lambda = parseFloat(document.getElementById('initialWavelength').value) * 1e-9;
@@ -108,17 +134,19 @@
             electron.style.top = 130 + "px";
 
             document.getElementById("result").innerHTML =
-                `Scattered Wavelength: <strong>${lambdaScattered_nm.toFixed(3)} nm</strong>`;
+                `Scattered Wavelength: <strong>${lambdaScattered_nm.toFixed(2)} nm</strong>`;
+            
+            
 
-            drawScatteringDiagram(thetaDeg,lambda);
-            animateScattering(thetaDeg,lambda);
+            drawScatteringDiagram(thetaDeg, lambda);
+            animateScattering(thetaDeg, lambda);
         }
 
         slider.addEventListener('input', () => {
-          output.textContent = slider.value;
+            output.textContent = slider.value;
         });
 
-        function drawScatteringDiagram(angle,lambda) {
+        function drawScatteringDiagram(angle, lambda) {
             const svg = document.getElementById("scatteringSVG");
             svg.innerHTML = ""; // Clear previous
 
@@ -126,7 +154,7 @@
             const r = 150; // Length for lines
 
             const theta1 = angle * Math.PI / 180;
-            
+
             const incidentLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
             const deltaLambda = comptonConst * (1 - Math.cos(theta1));
             const lambdaScattered = lambda + deltaLambda;
@@ -175,7 +203,7 @@
 
             const arcRadius = 30;
             const arcStartAngle = 0; // 180 deg (left)
-            const arcEndAngle =  thetaRad; // left + scattering angle
+            const arcEndAngle = thetaRad; // left + scattering angle
             const arcStartX = cx + arcRadius * Math.cos(arcStartAngle);
             const arcStartY = cy + arcRadius * Math.sin(arcStartAngle);
             const arcEndX = cx + arcRadius * Math.cos(arcEndAngle);
@@ -190,14 +218,14 @@
             arcPath.setAttribute("stroke-width", "2");
             arcPath.setAttribute("fill", "none");
             svg.appendChild(arcPath);
-            
+
             const arcStartAngle1 = 0; // 180 deg (left)
-            const arcEndAngle1 =  thetaRad; // left + scattering angle
+            const arcEndAngle1 = thetaRad; // left + scattering angle
             const arcStartX1 = cx + arcRadius * Math.cos(arcStartAngle1);
             const arcStartY1 = cy + arcRadius * Math.sin(arcStartAngle1);
             const arcEndX1 = cx + arcRadius * Math.cos(arcEndAngle1);
             const arcEndY1 = cy + arcRadius * Math.sin(arcEndAngle1);
-            const arcFlag1 = (180/3.14)*phi > 180 ? 1 : 0;
+            const arcFlag1 = (180 / 3.14) * phi > 180 ? 1 : 0;
             const arcPath1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
             arcPath.setAttribute(
                 "d",
@@ -227,10 +255,10 @@
             angleText1.setAttribute("y", labelY1);
             angleText1.setAttribute("fill", "#0ff");
             angleText1.setAttribute("font-size", "16");
-            angleText1.textContent = `${(180/3.14)*phi}°`;
+            angleText1.textContent = `${(180 / 3.14) * phi}°`;
             svg.appendChild(angleText1);
         }
-        function animateScattering(angle,lambda) {
+        function animateScattering(angle, lambda) {
             const incoming = document.getElementById("incomingPhoton");
             const scattered = document.getElementById("scatteredPhoton");
             const electron = document.getElementById("electron");
@@ -285,8 +313,8 @@
                 }
                 scattered.style.left = (280 + vx * t - 5) + "px";
                 scattered.style.top = (140 + vy * t - 5) + "px";
-                electron.style.left = (280 + electronVx * t-10) + "px";
-                electron.style.top = (140 + electronVy * t-10) + "px";
+                electron.style.left = (280 + electronVx * t - 10) + "px";
+                electron.style.top = (140 + electronVy * t - 10) + "px";
                 t += 2;
             }, 20);
         }
